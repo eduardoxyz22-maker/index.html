@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fichas de Capacitación — Heaven Colchones</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #00838F;
+    --teal-dark: #006064;
+    --teal-light: #E0F7FA;
+    --gold: #B8860B;
+    --gold-light: #FFF8E1;
+    --slate: #546E7A;
+    --slate-light: #ECEFF1;
+    --purple: #6A1B9A;
+    --purple-light: #F3E5F5;
+    --warn: #FF9800;
+    --warn-light: #FFF3E0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #f0fafe 0%, #e8f4f8 50%, #f5f9fc 100%);
+    min-height: 100vh;
+    color: #222;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #006064, #00838F);
+    padding: 28px 20px 22px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,96,100,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-sub { font-size: 10px; letter-spacing: 5px; color: #80DEEA; text-transform: uppercase; margin-bottom: 5px; }
+  .header-title { font-family: 'Playfair Display', serif; font-size: 24px; color: #fff; }
+  .header-desc { font-size: 12px; color: #B2EBF2; margin-top: 5px; }
+
+  /* FILTROS */
+  .filters {
+    padding: 14px 16px 0;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+
+  .filter-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    background: #fff;
+    color: #666;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+  }
+  .filter-btn.active {
+    background: var(--teal);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(0,131,143,0.4);
+  }
+
+  /* GRID PRODUCTOS */
+  .products-grid {
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+
+  .product-card {
+    padding: 12px 10px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .product-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  .product-card.selected { border-color: var(--line-color); background: var(--line-bg); box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+  .product-emoji { font-size: 22px; }
+  .product-name { font-size: 12px; font-weight: 700; margin-top: 4px; }
+  .product-linea { font-size: 10px; color: #999; margin-top: 2px; }
+
+  /* FICHA DETALLE */
+  .detail {
+    margin: 0 16px 28px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: none;
+  }
+  .detail.visible { display: block; animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Header ficha */
+  .detail-header {
+    padding: 20px 20px 16px;
+  }
+  .detail-meta { display: flex; justify-content: space-between; align-items: flex-start; }
+  .detail-line-label { font-size: 10px; letter-spacing: 3px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+  .detail-title { font-family: 'Playfair Display', serif; font-size: 24px; color: #fff; margin-top: 2px; }
+  .detail-slogan { font-size: 13px; color: rgba(255,255,255,0.9); margin-top: 5px; font-style: italic; }
+
+  .garantia-badge {
+    background: rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 8px 12px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.3);
+    flex-shrink: 0;
+  }
+  .garantia-num { font-size: 22px; font-weight: 900; color: #fff; }
+  .garantia-label { font-size: 9px; color: rgba(255,255,255,0.8); letter-spacing: 1px; }
+
+  .specs {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .spec-chip {
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 11px;
+    color: #fff;
+  }
+
+  /* Tags */
+  .tags {
+    padding: 12px 20px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 12px 4px;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    border-bottom: 2.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { font-weight: 700; border-bottom-color: currentColor; }
+
+  /* Tab content */
+  .tab-content { display: none; padding: 16px 20px 20px; }
+  .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #aaa;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* Items de venta */
+  .sell-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border-left: 3px solid;
+  }
+  .sell-num { font-weight: 700; font-size: 13px; flex-shrink: 0; }
+  .sell-text { font-size: 13px; color: #333; line-height: 1.5; }
+
+  /* Aviso */
+  .warning-box {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: var(--warn-light);
+    border-radius: 10px;
+    border-left: 3px solid var(--warn);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 12px;
+    color: #BF360C;
+    line-height: 1.5;
+  }
+
+  /* Para quién */
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    background: #f9f9f9;
+    border-radius: 10px;
+  }
+  .check-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .check-text { font-size: 13px; color: #333; line-height: 1.5; }
+
+  /* Objeciones */
+  .objection { margin-bottom: 14px; }
+  .obj-q {
+    padding: 10px 14px;
+    background: var(--warn-light);
+    border-radius: 10px 10px 0 0;
+    border-left: 3px solid var(--warn);
+    font-size: 13px;
+    color: #BF360C;
+    font-style: italic;
+  }
+  .obj-a {
+    padding: 10px 14px;
+    border-radius: 0 0 10px 10px;
+    border-left: 3px solid;
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 12px 16px 32px;
+    font-size: 11px;
+    color: #bbb;
+  }
+
+  /* Hidden products */
+  .product-card.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-sub">Heaven Colchones</div>
+  <div class="header-title">Guía de Capacitación</div>
+  <div class="header-desc">Para impulsadoras — cómo explicar cada producto</div>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="products-grid" id="productsGrid"></div>
+<div class="detail" id="detail"></div>
+<div class="footer">Heaven Colchones · Guía interna para impulsadoras</div>
+
+<script>
+const products = [
+  {
+    id: 1,
+    linea: "LÍNEA TITANIO",
+    lineaColor: "#0097A7",
+    lineaBg: "#E0F7FA",
+    nombre: "Natural Latex",
+    emoji: "🌿",
+    eslogan: "Lo más premium. Lo más natural.",
+    garantia: 10,
+    altura: "35 cm",
+    resistencia: "150 kg/persona",
+    firmeza: "Suave",
+    tags: ["Latex Natural","Resortes Pocket","Euro Top","Tela Fría","Antialérgico"],
+    paraCuien: [
+      "Parejas con pesos diferentes",
+      "Personas que buscan lo MEJOR del catálogo",
+      "Quienes tienen calor al dormir",
+      "Clientes con alergias o asma"
+    ],
+    comoVenderlo: [
+      "«Este es nuestro colchón TOP de línea — el único con latex 100% natural»",
+      "«Soporta hasta 150 kg por persona, perfecto para dos»",
+      "«Con tela fría, nunca más vas a sentir calor en la noche»",
+      "«Tiene 10 años de garantía — la más larga de toda la marca»"
+    ],
+    noDecir: "No menciones el precio primero. Primero enamóralos con los beneficios.",
+    objeciones: {
+      "¿Es muy caro?": "«La garantía de 10 años lo hace una inversión, no un gasto»",
+      "¿Qué es el latex?": "«Es material 100% natural, como la goma de árbol — muy duradero y cero químicos»"
+    }
+  },
+  {
+    id: 2,
+    linea: "LÍNEA TITANIO",
+    lineaColor: "#0097A7",
+    lineaBg: "#E0F7FA",
+    nombre: "Titanio Ice",
+    emoji: "❄️",
+    eslogan: "Para quien duerme con calor.",
+    garantia: 10,
+    altura: "30 cm",
+    resistencia: "100 kg/persona",
+    firmeza: "Medio",
+    tags: ["Memory Foam","System Cool 20°C","Resortes Pocket","5 Zonas de Resistencia"],
+    paraCuien: [
+      "Personas que transpiran mucho al dormir",
+      "Clientes en ciudades calurosas — ¡perfecto para Santa Cruz!",
+      "Quienes quieren tecnología NASA en su cama",
+      "Parejas que se mueven mucho"
+    ],
+    comoVenderlo: [
+      "«Tiene tecnología System Cool Fresh que mantiene la cama a 20°C toda la noche»",
+      "«La espuma es de la NASA — se adapta exactamente a tu cuerpo»",
+      "«Los resortes son independientes, si tu pareja se mueve, vos no lo sentís»",
+      "«10 años de garantía, igual que el Natural Latex»"
+    ],
+    noDecir: "No lo compares con el Natural Latex si el cliente no pregunta.",
+    objeciones: {
+      "¿Realmente enfría?": "«La tela tiene fibras especiales que disipan el calor corporal toda la noche»",
+      "¿Qué es Memory Foam?": "«Es una espuma que 'recuerda' la forma de tu cuerpo y te abraza mientras dormís»"
+    }
+  },
+  {
+    id: 3,
+    linea: "LÍNEA ORO",
+    lineaColor: "#B8860B",
+    lineaBg: "#FFF8E1",
+    nombre: "Anatómico Viscoelástico",
+    emoji: "🏅",
+    eslogan: "Confort inteligente para tu cuerpo.",
+    garantia: 8,
+    altura: "28 cm",
+    resistencia: "100 kg/persona",
+    firmeza: "Suave",
+    tags: ["Memory Foam","Resortes Pocket","Euro Top","Thermo Regulador","Anatómico"],
+    paraCuien: [
+      "Personas que buscan máximo confort sin llegar al precio Titanio",
+      "Quienes duermen de lado o boca arriba",
+      "Clientes que se quejan de despertarse con dolor",
+      "Parejas con movimientos independientes"
+    ],
+    comoVenderlo: [
+      "«Tiene cápsulas de viscoelástico en la superficie — se siente como dormir en nubes»",
+      "«Es anatómico: se adapta a cada curva de tu cuerpo»",
+      "«El thermo regulador equilibra la temperatura para que no pases ni frío ni calor»",
+      "«8 años de garantía — muy sólida para el precio»"
+    ],
+    noDecir: "No digas que es 'igual al Titanio pero más barato'. Cada uno tiene su propuesta única.",
+    objeciones: {
+      "¿Cuál es la diferencia con el Ice?": "«El Viscoelástico es más suave y envolvente; el Ice está pensado para regular temperatura»"
+    }
+  },
+  {
+    id: 4,
+    linea: "LÍNEA ORO",
+    lineaColor: "#B8860B",
+    lineaBg: "#FFF8E1",
+    nombre: "Bi-Relax Anti Stress",
+    emoji: "⚡",
+    eslogan: "El único con dos firmezas en uno.",
+    garantia: 8,
+    altura: "26 cm",
+    resistencia: "130 kg/persona",
+    firmeza: "Firme / Suave",
+    tags: ["Tejido con Grafeno","Antiestática","Thermoregulador","Voltea","Resortes Bonnell"],
+    paraCuien: [
+      "Parejas que NO se ponen de acuerdo en la firmeza",
+      "Personas con estrés o tensión muscular",
+      "Quienes buscan algo diferente y tecnológico",
+      "Clientes de cuerpo robusto (hasta 130 kg)"
+    ],
+    comoVenderlo: [
+      "«¿Tu pareja quiere firme y vos suave? Este colchón tiene LOS DOS LADOS»",
+      "«El tejido con grafeno libera la energía estática del cuerpo — como un reset para tus músculos»",
+      "«Solo tenés que voltearlo para cambiar la firmeza»",
+      "«Soporta hasta 130 kg por persona — muy resistente»"
+    ],
+    noDecir: "No mezcles el concepto de 'antiestática' con 'eléctrico'. Explicá que libera tensión corporal.",
+    objeciones: {
+      "¿Qué es el grafeno?": "«Es un material ultrafino que libera la electricidad estática de tu cuerpo mientras dormís — reduce la tensión muscular»",
+      "¿Cómo lo volteo?": "«Tiene las dos caras claramente diferenciadas, es muy fácil de identificar»"
+    }
+  },
+  {
+    id: 5,
+    linea: "LÍNEA ORO",
+    lineaColor: "#B8860B",
+    lineaBg: "#FFF8E1",
+    nombre: "Ortopédico Oro",
+    emoji: "🦴",
+    eslogan: "Tu espalda te lo va a agradecer.",
+    garantia: 8,
+    altura: "28 cm",
+    resistencia: "110 kg/persona",
+    firmeza: "Extra Firme",
+    tags: ["Pillow Top","Resortes Bonnell","Ortopédico","Euro Top","Ideal Columna"],
+    paraCuien: [
+      "Personas con dolores de espalda o columna",
+      "Quienes prefieren colchón bien firme",
+      "Clientes que buscan respaldo ortopédico",
+      "Personas de cuerpo fuerte"
+    ],
+    comoVenderlo: [
+      "«Está diseñado específicamente para problemas de espalda y columna»",
+      "«El Pillow Top le da suavidad en la superficie, pero el interior es extra firme»",
+      "«El resorte Bonnell da un soporte más sólido y uniforme»",
+      "«Ideal si dormís boca arriba — mantiene la columna en posición correcta»"
+    ],
+    noDecir: "No prometás que 'cura' dolores. Decí que ayuda a mantener la postura correcta.",
+    objeciones: {
+      "¿Es muy duro?": "«El Pillow Top en la superficie lo hace cómodo — firme no significa incómodo»",
+      "¿El médico me lo recomendó?": "«Es la elección más frecuente para quienes tienen indicación ortopédica»"
+    }
+  },
+  {
+    id: 6,
+    linea: "LÍNEA ESPECIAL",
+    lineaColor: "#546E7A",
+    lineaBg: "#ECEFF1",
+    nombre: "Semiortopédico",
+    emoji: "🌡️",
+    eslogan: "Para invierno y verano, un solo colchón.",
+    garantia: 6,
+    altura: "24 cm",
+    resistencia: "100 kg/persona",
+    firmeza: "Firme",
+    tags: ["Doble Sensación","Invierno/Verano","Voltea","Resortes Bonnell"],
+    paraCuien: [
+      "Clientes con presupuesto intermedio",
+      "Personas que sienten mucho el cambio de temperatura entre estaciones",
+      "Quienes buscan ortopédico a buen precio"
+    ],
+    comoVenderlo: [
+      "«Tiene dos caras: una para invierno (más abrigada) y una para verano (más fresca)»",
+      "«Solo lo volteas cuando cambia el clima»",
+      "«Muy buena opción si querés ortopédico sin llegar al precio Oro»",
+      "«6 años de garantía — muy confiable»"
+    ],
+    noDecir: "No lo presentes como 'el más barato'. Presentalo como 'la opción inteligente'.",
+    objeciones: {
+      "¿Cuánto más dura que uno normal?": "«Con los 6 años de garantía y la opción de voltear, dura muchos años más»"
+    }
+  },
+  {
+    id: 7,
+    linea: "LÍNEA ESPECIAL",
+    lineaColor: "#546E7A",
+    lineaBg: "#ECEFF1",
+    nombre: "Especial Tropical",
+    emoji: "🌴",
+    eslogan: "Algodón natural, confort real.",
+    garantia: 6,
+    altura: "22 cm",
+    resistencia: "110 kg/persona",
+    firmeza: "Medio",
+    tags: ["Doble Capa Algodón","Resortes Bonnell","Antialérgico","Voltea"],
+    paraCuien: [
+      "Clientes que prefieren materiales naturales",
+      "Presupuesto accesible",
+      "Segundo dormitorio o cuarto de huéspedes",
+      "Personas sin necesidades especiales de columna"
+    ],
+    comoVenderlo: [
+      "«Tiene doble capa de algodón natural — material limpio y transpirable»",
+      "«Soporta hasta 110 kg por persona, ideal para pareja»",
+      "«Precio accesible con garantía de 6 años»",
+      "«Antialérgico — perfecto si alguien en casa tiene alergias»"
+    ],
+    noDecir: "No lo presentes primero si el cliente puede acceder a algo superior. Úsalo como alternativa de precio.",
+    objeciones: {
+      "¿Es bueno para la espalda?": "«Es de firmeza media — para quienes no tienen problemas puntuales de columna es muy confortable»"
+    }
+  },
+  {
+    id: 8,
+    linea: "LÍNEA ESPECIAL",
+    lineaColor: "#546E7A",
+    lineaBg: "#ECEFF1",
+    nombre: "Antialérgico",
+    emoji: "👶",
+    eslogan: "Suave, seguro, pensado para los más chicos.",
+    garantia: 6,
+    altura: "22 cm",
+    resistencia: "90 kg/persona",
+    firmeza: "Suave",
+    tags: ["Infanto-Juvenil","Resortes Flexibles","Antialérgico","Antiácaros","Antibacterias"],
+    paraCuien: [
+      "Niños y adolescentes",
+      "Personas con alergias respiratorias",
+      "Primer colchón propio",
+      "Habitaciones infantiles"
+    ],
+    comoVenderlo: [
+      "«Está diseñado especialmente para niños y jóvenes»",
+      "«Los tejidos son antiácaros y antibacterianos — protege la salud respiratoria»",
+      "«Los resortes son más flexibles y adaptados para cuerpos en crecimiento»",
+      "«Muy buena opción para regalos a familias con hijos»"
+    ],
+    noDecir: "No menciones el límite de 90 kg si no te preguntan — el cliente lo asocia al niño, no al producto.",
+    objeciones: {
+      "¿Es solo para niños?": "«Está optimizado para niños y jóvenes, pero adultos de contextura liviana también lo usan»"
+    }
+  },
+  {
+    id: 9,
+    linea: "LÍNEA ESPECIAL",
+    lineaColor: "#546E7A",
+    lineaBg: "#ECEFF1",
+    nombre: "Ortopédico Especial",
+    emoji: "💪",
+    eslogan: "Firmeza total para quienes la necesitan.",
+    garantia: 6,
+    altura: "27 cm",
+    resistencia: "100 kg/persona",
+    firmeza: "Extra Firme",
+    tags: ["Extra Firme","Cuerpos Fuertes","Ortopédico","Resortes Bonnell","Columna"],
+    paraCuien: [
+      "Personas con problemas de espalda con presupuesto ajustado",
+      "Cuerpos fuertes o personas robustas",
+      "Quienes necesitan ortopédico sin llegar a línea Oro"
+    ],
+    comoVenderlo: [
+      "«Es el ortopédico más accesible del catálogo — sin sacrificar firmeza»",
+      "«Extra firme, ideal para cuerpos fuertes que necesitan buen soporte»",
+      "«Pensado para quienes tienen indicación de colchón ortopédico»",
+      "«27 cm de altura — buena presencia y soporte»"
+    ],
+    noDecir: "No lo compares negativamente con el Ortopédico Oro. Cada uno tiene su nivel.",
+    objeciones: {
+      "¿En qué se diferencia del Ortopédico Oro?": "«El Oro tiene Pillow Top y mayor garantía (8 vs 6 años). Este da la misma firmeza a mejor precio»"
+    }
+  },
+  {
+    id: 10,
+    linea: "COMPLEMENTOS",
+    lineaColor: "#6A1B9A",
+    lineaBg: "#F3E5F5",
+    nombre: "Almohadas",
+    emoji: "🛏️",
+    eslogan: "El complemento perfecto para un buen descanso.",
+    garantia: null,
+    altura: null,
+    resistencia: null,
+    firmeza: "Extra Firme",
+    tags: ["Fibra Siliconada","50×70 cm","50×90 cm","Extra Firme"],
+    paraCuien: [
+      "Cualquier cliente que compra colchón",
+      "Quienes duermen de lado (la 50×90 es ideal)",
+      "Venta complementaria — siempre ofrecer"
+    ],
+    comoVenderlo: [
+      "«¿Ya tenés almohada nueva para acompañar el colchón?»",
+      "«La 50×90 es la más completa — ideal para quienes duermen de lado»",
+      "«Fibra siliconada: no se aplasta, mantiene la altura toda la noche»",
+      "«Completá el combo y dormí perfecto desde el primer día»"
+    ],
+    noDecir: "No la ofrezcas al final como afterthought. Integrala durante la venta principal.",
+    objeciones: {
+      "Ya tengo almohada": "«Pero con el colchón nuevo, una almohada nueva hace toda la diferencia — es el complemento ideal»"
+    }
+  }
+];
+
+const lineas = ["TODOS", "LÍNEA TITANIO", "LÍNEA ORO", "LÍNEA ESPECIAL", "COMPLEMENTOS"];
+let currentFilter = "TODOS";
+let currentProduct = products[0];
+let currentTab = "vender";
+
+// Render filtros
+const filtersEl = document.getElementById("filters");
+lineas.forEach(l => {
+  const btn = document.createElement("button");
+  btn.className = "filter-btn" + (l === "TODOS" ? " active" : "");
+  btn.textContent = l;
+  btn.onclick = () => {
+    currentFilter = l;
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderGrid();
+    const visible = products.filter(p => l === "TODOS" || p.linea === l);
+    if (visible.length) selectProduct(visible[0]);
+  };
+  filtersEl.appendChild(btn);
+});
+
+// Render grid
+function renderGrid() {
+  const grid = document.getElementById("productsGrid");
+  grid.innerHTML = "";
+  products.forEach(p => {
+    if (currentFilter !== "TODOS" && p.linea !== currentFilter) return;
+    const card = document.createElement("button");
+    card.className = "product-card" + (p.id === currentProduct.id ? " selected" : "");
+    card.style.setProperty("--line-color", p.lineaColor);
+    card.style.setProperty("--line-bg", p.lineaBg);
+    card.innerHTML = `
+      <div class="product-emoji">${p.emoji}</div>
+      <div class="product-name" style="color:${p.lineaColor}">${p.nombre}</div>
+      <div class="product-linea">${p.linea}</div>
+    `;
+    card.onclick = () => selectProduct(p);
+    grid.appendChild(card);
+  });
+}
+
+// Select product
+function selectProduct(p) {
+  currentProduct = p;
+  currentTab = "vender";
+  renderGrid();
+  renderDetail();
+  document.getElementById("detail").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// Render detail
+function renderDetail() {
+  const p = currentProduct;
+  const detail = document.getElementById("detail");
+  detail.className = "detail visible";
+  detail.style.borderColor = p.lineaColor + "22";
+
+  const specsHtml = p.altura ? `
+    <div class="specs">
+      <div class="spec-chip">📏 ${p.altura}</div>
+      <div class="spec-chip">⚖️ ${p.resistencia}</div>
+      <div class="spec-chip">🛌 ${p.firmeza}</div>
+    </div>
+  ` : "";
+
+  const garantiaHtml = p.garantia ? `
+    <div class="garantia-badge">
+      <div class="garantia-num">${p.garantia}</div>
+      <div class="garantia-label">AÑOS GAR.</div>
+    </div>
+  ` : "";
+
+  const tagsHtml = p.tags.map(t => `
+    <span class="tag" style="background:${p.lineaBg};color:${p.lineaColor}">${t}</span>
+  `).join("");
+
+  const vendHtml = p.comoVenderlo.map((f, i) => `
+    <div class="sell-item" style="background:${p.lineaBg};border-color:${p.lineaColor}">
+      <span class="sell-num" style="color:${p.lineaColor}">${i + 1}.</span>
+      <span class="sell-text">${f}</span>
+    </div>
+  `).join("") + (p.noDecir ? `
+    <div class="warning-box">
+      <span>⚠️</span>
+      <span><strong>Tené en cuenta:</strong> ${p.noDecir}</span>
+    </div>
+  ` : "");
+
+  const quienHtml = p.paraCuien.map(c => `
+    <div class="check-item">
+      <div class="check-circle" style="background:${p.lineaColor}">✓</div>
+      <div class="check-text">${c}</div>
+    </div>
+  `).join("");
+
+  const objHtml = Object.entries(p.objeciones).map(([q, a]) => `
+    <div class="objection">
+      <div class="obj-q">🗣️ "${q}"</div>
+      <div class="obj-a" style="background:${p.lineaBg};border-color:${p.lineaColor}">💡 ${a}</div>
+    </div>
+  `).join("");
+
+  detail.innerHTML = `
+    <div class="detail-header" style="background:linear-gradient(135deg,${p.lineaColor},${p.lineaColor}CC)">
+      <div class="detail-meta">
+        <div>
+          <div class="detail-line-label">${p.linea}</div>
+          <div class="detail-title">${p.emoji} ${p.nombre}</div>
+          <div class="detail-slogan">"${p.eslogan}"</div>
+        </div>
+        ${garantiaHtml}
+      </div>
+      ${specsHtml}
+    </div>
+
+    <div class="tags">${tagsHtml}</div>
+
+    <div class="tabs">
+      <button class="tab-btn active" style="color:${p.lineaColor}" data-tab="vender" onclick="switchTab(this,'vender')">💬 Cómo venderlo</button>
+      <button class="tab-btn" data-tab="quien" onclick="switchTab(this,'quien')">👤 Para quién</button>
+      <button class="tab-btn" data-tab="objecion" onclick="switchTab(this,'objecion')">🛡️ Objeciones</button>
+    </div>
+
+    <div id="tab-vender" class="tab-content active">
+      <div class="section-label">Frases que podés usar:</div>
+      ${vendHtml}
+    </div>
+    <div id="tab-quien" class="tab-content">
+      <div class="section-label">Este colchón es ideal para:</div>
+      ${quienHtml}
+    </div>
+    <div id="tab-objecion" class="tab-content">
+      <div class="section-label">Cómo responder cuando te dicen:</div>
+      ${objHtml}
+    </div>
+  `;
+}
+
+function switchTab(btn, tab) {
+  currentTab = tab;
+  const p = currentProduct;
+  document.querySelectorAll(".tab-btn").forEach(b => {
+    b.classList.remove("active");
+    b.style.color = "#999";
+  });
+  btn.classList.add("active");
+  btn.style.color = p.lineaColor;
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  document.getElementById("tab-" + tab).classList.add("active");
+}
+
+// Init
+renderGrid();
+renderDetail();
+</script>
+</body>
+</html>
